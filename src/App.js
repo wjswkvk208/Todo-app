@@ -5,23 +5,16 @@ import TodoList from './components/TodoList';
 
 const App = () => {
 
-  const [todos, setTodos] =  useState([
-    {
-      id:1,
-      text:'제어ㅣ스템',
-      checked:true
-    },
-    {
-      id:2,
-      text:'제어ㅣ스템1',
-      checked:true
-    },
-    {
-      id:3,
-      text:'제어ㅣ스템22',
-      checked:false
+  function createBulkTodos(){
+    const arr =[];
+    for(let i=1; i<=2500; i++){
+      arr.push({id:i,text:`할 일 ${i}`,checked:false});
     }
-  ]);
+
+    return arr;
+  }
+
+  const [todos, setTodos] =  useState(createBulkTodos);
 
   const nextId = useRef(4);
 
@@ -31,15 +24,27 @@ const App = () => {
         id:nextId.current,
         text,checked:false,
       };
-      setTodos(todos.concat(todo));
+      setTodos(todos => todos.concat(todo));
       nextId.current += 1;
-    },[todos]
+    },[],
+  );
+
+  const onRemove = useCallback(
+    id => {
+      setTodos(todos => todos.filter(todo => todo.id !== id));
+    },[]
+  );
+
+  const onToggle = useCallback(
+    id => {      
+      setTodos(todos => todos.map(todo => todo.id === id?{...todo,checked:!todo.checked} : todo,));
+    },[]
   );
 
   return (
     <TodoTemplate>
       <TodoInsert onInsert={onInsert} />
-      <TodoList todos={todos} />
+      <TodoList todos={todos} onRemove={onRemove} onToggle={onToggle}/>
     </TodoTemplate>
   );
 };
